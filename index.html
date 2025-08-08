@@ -1039,6 +1039,8 @@
 
         function updateParameters() {
             const oldBufferSecurity = params.bufferSecurity;
+            const oldProcesoVaciado = params.procesoVaciado;
+            const oldPoolEsperaSA = params.poolEsperaSA;
             
             params.numTanques = Math.max(1, parseInt(document.getElementById('numTanques').value) || 7);
             params.frecDespacho = Math.max(1, parseInt(document.getElementById('frecDespacho').value) || 10);
@@ -1047,14 +1049,21 @@
             params.poolEsperaSIN = Math.max(1, parseInt(document.getElementById('poolEsperaSIN').value) || 10);
             params.procesoLlenado = Math.max(5, parseInt(document.getElementById('procesoLlenado').value) || 14);
             params.transitoSINSA = Math.max(30, parseInt(document.getElementById('transitoSINSA').value) || 60);
-            params.procesoVaciado = Math.max(30, parseInt(document.getElementById('procesoVaciado').value) || 60);
-            params.poolEsperaSA = Math.max(5, parseInt(document.getElementById('poolEsperaSA').value) || 14);
+            params.procesoVaciado = Math.max(0, parseInt(document.getElementById('procesoVaciado').value) || 60);
+            params.poolEsperaSA = Math.max(0, parseInt(document.getElementById('poolEsperaSA').value) || 14);
             params.transitoSASIN = Math.max(30, parseInt(document.getElementById('transitoSASIN').value) || 60);
             params.speed = Math.max(1, parseInt(document.getElementById('speedSlider').value) || 5);
             
             document.getElementById('speedValue').textContent = params.speed + 'x';
             document.getElementById('bufferMinimo').textContent = params.bufferSecurity;
             document.getElementById('bufferSecurityDisplay').textContent = params.bufferSecurity;
+            
+            // Debug: mostrar los nuevos valores en consola
+            console.log(`📊 Parámetros actualizados:`);
+            console.log(`   • Proceso Vaciado: ${params.procesoVaciado} días`);
+            console.log(`   • Pool Espera SA: ${params.poolEsperaSA} días`);
+            console.log(`   • Proceso Llenado: ${params.procesoLlenado} días`);
+            console.log(`   • Pool Espera SIN: ${params.poolEsperaSIN} días`);
             
             // Si cambió el buffer de seguridad, actualizar los tanques inmediatamente
             if (oldBufferSecurity !== params.bufferSecurity) {
@@ -1064,6 +1073,27 @@
                     tanks.forEach(tank => tank.updateVisual());
                     updateCounters();
                 }, 50);
+            }
+            
+            // Si cambiaron los parámetros de San Antonio, verificar tanques en esos estados
+            if (oldProcesoVaciado !== params.procesoVaciado || oldPoolEsperaSA !== params.poolEsperaSA) {
+                console.log(`🔄 Parámetros de San Antonio cambiaron:`);
+                console.log(`   • Proceso Vaciado: ${oldProcesoVaciado} → ${params.procesoVaciado}`);
+                console.log(`   • Pool Espera SA: ${oldPoolEsperaSA} → ${params.poolEsperaSA}`);
+                
+                // Verificar tanques que podrían necesitar transición inmediata
+                tanks.forEach(tank => {
+                    if (tank.state === STATES.PROCESO_VACIADO && tank.daysInState >= params.procesoVaciado) {
+                        console.log(`🚀 Tanque ${tank.id} en PROCESO_VACIADO necesita transición inmediata`);
+                        tank.state = STATES.POOL_ESPERA_SA;
+                        tank.daysInState = 0;
+                    }
+                    if (tank.state === STATES.POOL_ESPERA_SA && tank.daysInState >= params.poolEsperaSA) {
+                        console.log(`🚀 Tanque ${tank.id} en POOL_ESPERA_SA necesita transición inmediata`);
+                        tank.state = STATES.TRANSITO_SA_SIN;
+                        tank.daysInState = 0;
+                    }
+                });
             }
         }
 
@@ -1584,11 +1614,43 @@
             const inputs = document.querySelectorAll('input[type="number"]');
             inputs.forEach(input => {
                 if (input.id !== 'bufferSecurity') {
-                    input.addEventListener('change', function() {
+                    input.addEventListener('input', function() {
                         updateParameters();
-                        // Reinicializar simulación si no está corriendo
+                        console.log(`🔄 Parámetro ${this.id} cambiado a: ${this.value}`);
+                        
+                        // Reinicializar simulación para aplicar los nuevos parámetros
                         if (!isRunning) {
                             initializeSimulation();
+                        } else {
+                                                    // Si está corriendo, forzar actualización de todos los tanques
+                        console.log(`🔄 Aplicando nuevos parámetros a ${tanks.length} tanques existentes...`);
+                        
+                        tanks.forEach(tank => {
+                            // Forzar transición inmediata para tanques en estados afectados por los parámetros
+                            if (this.id === 'procesoVaciado' && tank.state === STATES.PROCESO_VACIADO) {
+                                console.log(`🚀 Aplicando nuevo parámetro procesoVaciado: ${params.procesoVaciado} días`);
+                                // Si el nuevo valor es menor que los días actuales, forzar transición
+                                if (tank.daysInState >= params.procesoVaciado) {
+                                    console.log(`🚀 Forzando transición inmediata para tanque en PROCESO_VACIADO`);
+                                    tank.state = STATES.POOL_ESPERA_SA;
+                                    tank.daysInState = 0;
+                                }
+                            }
+                            if (this.id === 'poolEsperaSA' && tank.state === STATES.POOL_ESPERA_SA) {
+                                console.log(`🚀 Aplicando nuevo parámetro poolEsperaSA: ${params.poolEsperaSA} días`);
+                                // Si el nuevo valor es menor que los días actuales, forzar transición
+                                if (tank.daysInState >= params.poolEsperaSA) {
+                                    console.log(`🚀 Forzando transición inmediata para tanque en POOL_ESPERA_SA`);
+                                    tank.state = STATES.TRANSITO_SA_SIN;
+                                    tank.daysInState = 0;
+                                }
+                            }
+                            
+                            tank.update();
+                            tank.updateVisual();
+                        });
+                        updateCounters();
+                        console.log(`✅ Parámetros aplicados. Proceso Vaciado: ${params.procesoVaciado} días, Pool Espera SA: ${params.poolEsperaSA} días`);
                         }
                     });
                 }
