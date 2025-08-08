@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulación Operador Logístico</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            max-height: 80px;
+            max-width: 200px;
+            object-fit: contain;
+            filter: brightness(0.9) contrast(1.1) saturate(0.8);
+            mix-blend-mode: multiply;
+            background: transparent;
+            border-radius: 8px;
+            padding: 5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #7f8c8d;
+        }
+
+        .control-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .control-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+        }
+
+        .control-section h3 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+        }
+
+        .param-group {
+            display: grid;
+            grid-template-columns: 1fr 70px;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .param-group label {
+            font-size: 0.85rem;
+            color: #495057;
+        }
+
+        .param-group input {
+            padding: 6px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        .simulation-controls {
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .control-btn {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 0 8px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .control-btn.pause {
+            background: linear-gradient(45deg, #ffc107, #e0a800);
+        }
+
+        .control-btn.reset {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+        }
+
+                 .status-panel {
+             display: grid;
+             grid-template-columns: repeat(9, 1fr);
+             gap: 15px;
+             margin-bottom: 30px;
+         }
+
+        .status-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .status-card:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+        }
+
+        .status-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+
+        .status-label {
+            font-size: 0.8rem;
+            color: #666;
+            line-height: 1.2;
+        }
+
+        .simulation-canvas {
+            position: relative;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-radius: 15px;
+            height: 700px;
+            margin-bottom: 20px;
+            border: 3px solid #2196f3;
+            overflow: hidden;
+        }
+
+        .route-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 500px;
+            height: 500px;
+            border: 4px dashed #1976d2;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .location {
+            position: absolute;
+            background: white;
+            border: 3px solid #1976d2;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            min-width: 140px;
+            text-align: center;
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        .location.singapore {
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: white;
+        }
+
+        .location.san-antonio {
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            color: white;
+        }
+
+        .tank {
+            position: absolute;
+            width: 14px;
+            height: 10px;
+            border-radius: 2px;
+            transition: all 0.8s ease;
+            border: 1px solid #333;
+            z-index: 5;
+        }
+
+        .tank.full {
+            background: #2196f3;
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.4);
+        }
+
+        .tank.empty {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .tank.buffer {
+            background: #4caf50;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-tank {
+            width: 16px;
+            height: 10px;
+            border-radius: 2px;
+            border: 1px solid #333;
+        }
+
+        .legend-tank.full {
+            background: #2196f3;
+        }
+
+        .legend-tank.empty {
+            background: white;
+        }
+
+        .legend-tank.buffer {
+            background: #4caf50;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .speed-slider {
+            width: 150px;
+        }
+
+        .cycle-info {
+            background: #e8f4fd;
+            border: 2px solid #2196f3;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .cycle-info h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .cycle-stages {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .stage {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+
+        .stage-title {
+            font-weight: bold;
+            color: #1976d2;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .stage-days {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 1400px) {
+            .control-panel {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .status-panel {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .control-panel {
+                grid-template-columns: 1fr;
+            }
+            
+            .status-panel {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .route-circle {
+                width: 350px;
+                height: 350px;
+            }
+
+            .cycle-stages {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Estilos para el gráfico de barras */
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .chart-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-header h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .chart-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .chart-btn {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .chart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .chart-btn.active {
+            background: linear-gradient(45deg, #28a745, #20c997);
+        }
+
+        .chart-canvas {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .chart-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .chart-legend-color {
+            width: 16px;
+            height: 12px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="images/LOGO.jpg" alt="Logo Corporativo" class="logo">
+            <div class="header-content">
+                <h1>🚢 Simulación Operador Logístico</h1>
+                <p>Transporte de Tanques: Singapur ↔ Puerto San Antonio | Total: 109 Tanques</p>
+            </div>
+        </div>
+
+        <!-- Panel de Control -->
+        <div class="control-panel">
+            <div class="control-section">
+                <h3>📦 Parámetros Operativos</h3>
+                <div class="param-group">
+                    <label>Tanques por despacho:</label>
+                    <input type="number" id="numTanques" value="7" min="1" max="20">
+                </div>
+                <div class="param-group">
+                    <label>Frecuencia despacho:</label>
+                    <input type="number" id="frecDespacho" value="10" min="1" max="30">
+                </div>
+                <div class="param-group">
+                    <label>Total tanques circuito:</label>
+                    <input type="number" id="totalTanques" value="109" min="50" max="200">
+                </div>
+                <div class="param-group">
+                    <label>Buffer seguridad SIN:</label>
+                    <input type="number" id="bufferSecurity" value="20" min="10" max="50">
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>⏱️ Tiempos en Singapur</h3>
+                <div class="param-group">
+                    <label>Pool espera (días):</label>
+                    <input type="number" id="poolEsperaSIN" value="10" min="1" max="30">
+                </div>
+                <div class="param-group">
+                    <label>Proceso llenado:</label>
+                    <input type="number" id="procesoLlenado" value="14" min="5" max="30">
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>🚢 Tiempos de Tránsito</h3>
+                <div class="param-group">
+                    <label>SIN → SA (llenos):</label>
+                    <input type="number" id="transitoSINSA" value="60" min="30" max="120">
+                </div>
+                <div class="param-group">
+                    <label>SA → SIN (vacíos):</label>
+                    <input type="number" id="transitoSASIN" value="60" min="30" max="120">
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>⏱️ Tiempos en San Antonio</h3>
+                <div class="param-group">
+                    <label>Proceso vaciado:</label>
+                    <input type="number" id="procesoVaciado" value="60" min="30" max="120">
+                </div>
+                <div class="param-group">
+                    <label>Pool espera SA:</label>
+                    <input type="number" id="poolEsperaSA" value="14" min="5" max="30">
+                </div>
+                <div class="speed-control">
+                    <label>Velocidad:</label>
+                    <input type="range" id="speedSlider" class="speed-slider" min="1" max="15" value="5">
+                    <span id="speedValue">5x</span>
+                </div>
+                <div class="simulation-controls">
+                    <button class="control-btn" id="playBtn">▶️ Iniciar</button>
+                    <button class="control-btn reset" id="resetBtn">🔄 Reset</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de Estado -->
+        <div class="status-panel">
+            <div class="status-card">
+                <div class="status-value" id="dayCounter">0</div>
+                <div class="status-label">Días Transcurridos</div>
+            </div>
+            <div class="status-card">
+                <div class="status-value" id="tanquesBuffer">0</div>
+                <div class="status-label">Tanques en Pool<br>SIN (Vacíos)</div>
+            </div>
+            <div class="status-card">
+                <div class="status-value" id="tanquesLlenado">0</div>
+                <div class="status-label">En Proceso<br>Llenado SIN</div>
+            </div>
+            <div class="status-card">
+                <div class="status-value" id="tanquesLlenadoCompletado">0</div>
+                <div class="status-label">Llenado<br>Completado</div>
+            </div>
+            <div class="status-card">
+                <div class="status-value" id="bufferTanksCount">0</div>
+                <div class="status-label">🛡️ Buffer<br>Seguridad</div>
+            </div>
+            <div class="status-card">
+                <div class="status-value" id="tanquesTransitoLlenos">0</div>
+                <div class="status-label">Tránsito SIN→SA<br>(Llenos)</div>
+            </div>
+            <div class="status-card">
+                <div class="status-value" id="tanquesVaciado">0</div>
+                <div class="status-label">En SA<br>(Vaciado + Espera)</div>
+            </div>
+                         <div class="status-card">
+                 <div class="status-value" id="tanquesTransitoVacios">0</div>
+                 <div class="status-label">Tránsito SA→SIN<br>(Vacíos)</div>
+             </div>
+             <div class="status-card" style="background: linear-gradient(135deg, #28a745, #20c997); color: white;">
+                 <div class="status-value" id="tanquesAnuales" style="color: white;">0</div>
+                 <div class="status-label" style="color: white;">Tanques en Tránsito<br>Este Año (Ida + Vuelta)</div>
+             </div>
+         </div>
+
+                 <!-- Panel de Métricas del Primer Año -->
+         <div class="cycle-info" id="firstYearPanel" style="margin-bottom: 20px; display: none;">
+             <h3>📊 Métricas del Primer Año</h3>
+             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 15px;">
+                 <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #28a745;">
+                     <div style="font-size: 1.5rem; font-weight: bold; color: #28a745;" id="firstYearTanks">0</div>
+                     <div style="font-size: 0.9rem; color: #666;">Tanques Despachados</div>
+                 </div>
+                 <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #28a745;">
+                     <div style="font-size: 1.5rem; font-weight: bold; color: #28a745;" id="firstYearDays">0</div>
+                     <div style="font-size: 0.9rem; color: #666;">Días Transcurridos</div>
+                 </div>
+                 <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #28a745;">
+                     <div style="font-size: 1.5rem; font-weight: bold; color: #28a745;" id="firstYearAverage">0</div>
+                     <div style="font-size: 0.9rem; color: #666;">Promedio/Día</div>
+                 </div>
+                 <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #28a745;">
+                     <div style="font-size: 1.5rem; font-weight: bold; color: #28a745;" id="firstYearProjection">0</div>
+                     <div style="font-size: 0.9rem; color: #666;">Proyección Anual</div>
+                 </div>
+             </div>
+         </div>
+
+         <!-- Panel de Información del Buffer -->
+         <div class="cycle-info" style="margin-bottom: 20px;">
+            <h3>🛡️ Estado del Buffer de Seguridad</h3>
+                         <p style="text-align: center; color: #666; margin-bottom: 15px; font-size: 0.9rem;">
+                 Los primeros <strong id="bufferSecurityDisplay">20</strong> tanques (en verde) son el buffer de seguridad.<br>
+                 <strong>⚠️ IMPORTANTE:</strong> "Tanques Actuales en SIN" muestra cuántos tanques hay disponibles actualmente.<br>
+                 <em>Ajusta el "Buffer seguridad SIN" para mantener suficientes tanques en SIN.</em>
+             </p>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px;">
+                <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #e0e0e0;">
+                    <div style="font-size: 1.5rem; font-weight: bold; color: #007bff;" id="bufferStatus">✅</div>
+                    <div style="font-size: 0.9rem; color: #666;">Estado Buffer</div>
+                </div>
+                <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #e0e0e0;">
+                    <div style="font-size: 1.5rem; font-weight: bold; color: #007bff;" id="totalSIN">0</div>
+                    <div style="font-size: 0.9rem; color: #666;">Total en SIN</div>
+                </div>
+                <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #e0e0e0;">
+                    <div style="font-size: 1.5rem; font-weight: bold; color: #007bff;" id="bufferMinimo">20</div>
+                    <div style="font-size: 0.9rem; color: #666;">Mínimo Requerido</div>
+                </div>
+                                 <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #e0e0e0;">
+                     <div style="font-size: 1.5rem; font-weight: bold; color: #007bff;" id="tanquesActualesSIN">0</div>
+                     <div style="font-size: 0.9rem; color: #666;">Tanques Actuales<br>en SIN</div>
+                 </div>
+
+            </div>
+        </div>
+
+        <!-- Canvas de Simulación -->
+        <div class="simulation-canvas" id="simulationCanvas">
+            <div class="route-circle"></div>
+            
+            <div class="location singapore">
+                <div>🇸🇬 SINGAPUR (SIN)</div>
+                <div style="font-size: 0.8rem; margin-top: 5px;">Punto A - Origen</div>
+            </div>
+            
+            <div class="location san-antonio">
+                <div>🇨🇱 SAN ANTONIO (SA)</div>
+                <div style="font-size: 0.8rem; margin-top: 5px;">Punto B - Destino</div>
+            </div>
+        </div>
+
+        <!-- Leyenda -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-tank buffer"></div>
+                <span>🛡️ Buffer de Seguridad (Verde)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-tank full"></div>
+                <span>Tanques Llenos (Azul)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-tank empty"></div>
+                <span>Tanques en SA (Blancos)</span>
+            </div>
+            <div class="legend-item">
+                <span>🚢 Tránsito Marítimo</span>
+            </div>
+            <div class="legend-item">
+                <span>⚙️ Procesamiento</span>
+            </div>
+        </div>
+
+                 <!-- Información del Ciclo -->
+         <div class="cycle-info">
+             <h3>📋 Etapas del Ciclo Operativo</h3>
+             
+             <!-- Panel de Recomendaciones -->
+             <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                 <h4 style="color: #856404; margin-bottom: 10px;">💡 Recomendaciones para Ajustar el Buffer:</h4>
+                                   <ul style="color: #856404; font-size: 0.9rem; margin: 0; padding-left: 20px;">
+                      <li><strong>Buffer muy bajo:</strong> Si "Tanques Actuales en SIN" se mantiene bajo, incrementa el "Buffer seguridad SIN"</li>
+                      <li><strong>Buffer óptimo:</strong> Si "Tanques Actuales en SIN" se mantiene estable, tu configuración es buena</li>
+                      <li><strong>Buffer muy alto:</strong> Si "Tanques Actuales en SIN" siempre es alto, puedes reducirlo para optimizar recursos</li>
+                      <li><strong>Sin tanques en SIN:</strong> Si "Tanques Actuales en SIN" llega a 0, el buffer es insuficiente</li>
+                      <li><strong>Objetivo:</strong> Encontrar el mínimo buffer que mantenga suficientes tanques en SIN</li>
+                  </ul>
+             </div>
+            <div class="cycle-stages">
+                <div class="stage">
+                    <div class="stage-title">1. Pool Espera SIN</div>
+                    <div class="stage-days">10 días (Buffer)</div>
+                </div>
+                <div class="stage">
+                    <div class="stage-title">2. Proceso Llenado</div>
+                    <div class="stage-days">14 días</div>
+                </div>
+                <div class="stage">
+                    <div class="stage-title">3. Tránsito SIN→SA</div>
+                    <div class="stage-days">60 días (Llenos)</div>
+                </div>
+                <div class="stage">
+                    <div class="stage-title">4. Proceso Vaciado</div>
+                    <div class="stage-days">60 días</div>
+                </div>
+                <div class="stage">
+                    <div class="stage-title">5. Pool Espera SA</div>
+                    <div class="stage-days">14 días</div>
+                </div>
+                <div class="stage">
+                    <div class="stage-title">6. Tránsito SA→SIN</div>
+                    <div class="stage-days">60 días (Vacíos)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico de Barras para Métricas -->
+    <div class="chart-container">
+                     <div class="chart-header">
+                 <h3>📊 Gráfico de Distribución Actual</h3>
+                 <p>Visualización de la cantidad de tanques en cada etapa del proceso</p>
+             </div>
+        
+        <div class="chart-controls">
+                             <button class="chart-btn active" id="chartToggleBtn">🔄 Actualizar Gráfico</button>
+                 <button class="chart-btn" id="chartAutoBtn">⏸️ Auto-actualización</button>
+                 <button class="chart-btn" id="chartClearBtn">🔄 Refrescar</button>
+        </div>
+        
+        <canvas id="metricsChart" class="chart-canvas"></canvas>
+        
+        <div class="chart-legend">
+            <div class="chart-legend-item">
+                <div class="chart-legend-color" style="background: #6c757d;"></div>
+                <span>Tanques en Pool SIN (Vacíos)</span>
+            </div>
+            <div class="chart-legend-item">
+                <div class="chart-legend-color" style="background: #ffc107;"></div>
+                <span>En Proceso Llenado SIN</span>
+            </div>
+            <div class="chart-legend-item">
+                <div class="chart-legend-color" style="background: #ff9800;"></div>
+                <span>Llenado Completado</span>
+            </div>
+            <div class="chart-legend-item">
+                <div class="chart-legend-color" style="background: #28a745;"></div>
+                <span>🛡️ Buffer Seguridad</span>
+            </div>
+            <div class="chart-legend-item">
+                <div class="chart-legend-color" style="background: #007bff;"></div>
+                <span>Tránsito SIN→SA (Llenos)</span>
+            </div>
+            <div class="chart-legend-item">
+                <div class="chart-legend-color" style="background: #fd7e14;"></div>
+                <span>En SA (Vaciado + Espera)</span>
+            </div>
+            <div class="chart-legend-item">
+                <div class="chart-legend-color" style="background: #6f42c1;"></div>
+                <span>Tránsito SA→SIN (Vacíos)</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let isRunning = false;
+        let dayCounter = 0;
+        let tanks = [];
+        let simulationInterval = null;
+        let nextTankId = 0;
+        let lastDispatchDay = 0;
+        let lastDispatchDaySA = 0; // Variable separada para despacho desde SA
+
+                 let consecutiveDaysWithoutTanks = 0; // Días consecutivos sin tanques en SIN
+         let tanksDispatchedThisYear = 0; // Contador de tanques despachados en el año actual
+         let lastYearReset = 0; // Día en que se reinició el contador anual
+         let firstYearMetrics = null; // Métricas del primer año
+         let currentYear = 1; // Año actual de la simulación
+
+        // Variables para el gráfico de métricas
+        let chartData = [];
+        let chartAutoUpdate = false;
+        let chartUpdateInterval = null;
+        let chartCanvas = null;
+        let chartCtx = null;
+
+        // Parámetros según especificaciones
+        let params = {
+            numTanques: 7,              // Tanques despachados cada vez
+            frecDespacho: 10,           // Cada 10 días
+            totalTanques: 109,          // Total en todo el circuito
+            bufferSecurity: 20,         // Buffer de seguridad en SIN
+            poolEsperaSIN: 10,          // Pool de espera en SIN
+            procesoLlenado: 14,         // Proceso de llenado
+            transitoSINSA: 60,          // Tránsito SIN → SA (llenos)
+            procesoVaciado: 60,         // Proceso de vaciado en SA
+            poolEsperaSA: 14,           // Pool de espera en SA
+            transitoSASIN: 60,          // Tránsito SA → SIN (vacíos)
+            speed: 5
+        };
+
+        // Estados del ciclo según especificaciones
+        const STATES = {
+            POOL_ESPERA_SIN: 'pool_espera_sin',     // En Pool de Espera (SIN) - 10 días
+            PROCESO_LLENADO: 'proceso_llenado',     // En Proceso de Llenado (SIN) - 14 días
+            LLENADO_COMPLETADO: 'llenado_completado', // Llenado Completado, listo para despacho
+            TRANSITO_SIN_SA: 'transito_sin_sa',     // En Tránsito SIN→SA (Llenos) - 60 días
+            PROCESO_VACIADO: 'proceso_vaciado',     // En Proceso de Vaciado (SA) - 60 días
+            POOL_ESPERA_SA: 'pool_espera_sa',       // En Pool de Espera (SA) - 14 días
+            TRANSITO_SA_SIN: 'transito_sa_sin'      // En Tránsito SA→SIN (Vacíos) - 60 días
+        };
+
+        class Tank {
+            constructor(id, initialState = STATES.POOL_ESPERA_SIN) {
+                this.id = id;
+                this.state = initialState;
+                this.daysInState = Math.floor(Math.random() * this.getStateDuration());
+                this.element = null;
+                this.isBufferTank = id < params.bufferSecurity; // Los primeros tanques son buffer
+                this.createVisual();
+            }
+
+            getStateDuration() {
+                switch(this.state) {
+                    case STATES.POOL_ESPERA_SIN: return params.poolEsperaSIN;
+                    case STATES.PROCESO_LLENADO: return params.procesoLlenado;
+                    case STATES.LLENADO_COMPLETADO: return 0; // No tiene duración, ya está listo
+                    case STATES.TRANSITO_SIN_SA: return params.transitoSINSA;
+                    case STATES.PROCESO_VACIADO: return params.procesoVaciado;
+                    case STATES.POOL_ESPERA_SA: return params.poolEsperaSA;
+                    case STATES.TRANSITO_SA_SIN: return params.transitoSASIN;
+                    default: return 10;
+                }
+            }
+
+            createVisual() {
+                this.element = document.createElement('div');
+                this.element.className = 'tank';
+                this.element.id = `tank-${this.id}`;
+                document.getElementById('simulationCanvas').appendChild(this.element);
+                this.updateVisual();
+            }
+
+            update() {
+                this.daysInState++;
+                
+                switch(this.state) {
+                    case STATES.POOL_ESPERA_SIN:
+                        if (this.daysInState >= params.poolEsperaSIN) {
+                            this.state = STATES.PROCESO_LLENADO;
+                            this.daysInState = 0;
+                        }
+                        break;
+                        
+                    case STATES.PROCESO_LLENADO:
+                        if (this.daysInState >= params.procesoLlenado) {
+                            this.state = STATES.LLENADO_COMPLETADO;
+                            this.daysInState = 0;
+                        }
+                        break;
+                        
+                    case STATES.LLENADO_COMPLETADO:
+                        // No hay transición, ya está listo
+                        break;
+                        
+                    case STATES.TRANSITO_SIN_SA:
+                        if (this.daysInState >= params.transitoSINSA) {
+                            this.state = STATES.PROCESO_VACIADO;
+                            this.daysInState = 0;
+                        }
+                        break;
+                        
+                    case STATES.PROCESO_VACIADO:
+                        if (this.daysInState >= params.procesoVaciado) {
+                            this.state = STATES.POOL_ESPERA_SA;
+                            this.daysInState = 0;
+                        }
+                        break;
+                        
+                    case STATES.POOL_ESPERA_SA:
+                        if (this.daysInState >= params.poolEsperaSA) {
+                            this.state = STATES.TRANSITO_SA_SIN;
+                            this.daysInState = 0;
+                        }
+                        break;
+                        
+                    case STATES.TRANSITO_SA_SIN:
+                        if (this.daysInState >= params.transitoSASIN) {
+                            this.state = STATES.POOL_ESPERA_SIN;
+                            this.daysInState = 0;
+                        }
+                        break;
+                }
+                
+                this.updateVisual();
+            }
+
+            updateVisual() {
+                if (!this.element) return;
+
+                // Actualizar clase según estado
+                let className = 'tank ';
+                
+                // Los tanques del buffer siempre se muestran en verde
+                if (this.isBufferTank) {
+                    className += 'buffer';
+                } else {
+                    switch(this.state) {
+                        case STATES.POOL_ESPERA_SIN:
+                            className += 'empty'; // Tanques no-buffer en pool espera son blancos
+                            break;
+                        case STATES.PROCESO_LLENADO:
+                        case STATES.LLENADO_COMPLETADO:
+                        case STATES.TRANSITO_SIN_SA:
+                            className += 'full';
+                            break;
+                        case STATES.PROCESO_VACIADO:
+                        case STATES.POOL_ESPERA_SA:
+                        case STATES.TRANSITO_SA_SIN:
+                            className += 'empty';
+                            break;
+                    }
+                }
+                
+                this.element.className = className;
+
+                // Actualizar posición
+                const position = this.getPosition();
+                this.element.style.left = position.x + 'px';
+                this.element.style.top = position.y + 'px';
+            }
+
+            getPosition() {
+                const canvas = document.getElementById('simulationCanvas');
+                const centerX = canvas.offsetWidth / 2;
+                const centerY = canvas.offsetHeight / 2;
+                const radius = 250;
+
+                switch(this.state) {
+                    case STATES.POOL_ESPERA_SIN:
+                    case STATES.PROCESO_LLENADO:
+                        return this.getStackPosition('singapore');
+                        
+                    case STATES.LLENADO_COMPLETADO:
+                        return this.getStackPosition('singapore'); // Posición de espera
+                        
+                    case STATES.TRANSITO_SIN_SA:
+                        const progressAB = this.daysInState / params.transitoSINSA;
+                        const angleAB = -Math.PI/2 + (Math.PI * progressAB);
+                        
+                        // Posición base del grupo
+                        const baseXAB = centerX + radius * Math.cos(angleAB);
+                        const baseYAB = centerY + radius * Math.sin(angleAB);
+                        
+                        // Si es parte de un grupo, distribuir los tanques en formación
+                        if (this.groupId) {
+                            const groupTanks = tanks.filter(tank => 
+                                tank.groupId === this.groupId && 
+                                tank.state === STATES.TRANSITO_SIN_SA
+                            );
+                            
+                            // Formación en línea horizontal
+                            const spacing = 20;
+                            const totalWidth = (groupTanks.length - 1) * spacing;
+                            const startX = baseXAB - totalWidth / 2;
+                            
+                            return {
+                                x: startX + (this.groupIndex * spacing) - 7,
+                                y: baseYAB - 5
+                            };
+                        }
+                        
+                        return {
+                            x: baseXAB - 7,
+                            y: baseYAB - 5
+                        };
+                        
+                    case STATES.PROCESO_VACIADO:
+                    case STATES.POOL_ESPERA_SA:
+                        return this.getStackPosition('sanAntonio');
+                        
+                    case STATES.TRANSITO_SA_SIN:
+                        const progressBA = this.daysInState / params.transitoSASIN;
+                        const angleBA = Math.PI/2 + (Math.PI * progressBA);
+                        
+                        // Posición base del grupo
+                        const baseXBA = centerX + radius * Math.cos(angleBA);
+                        const baseYBA = centerY + radius * Math.sin(angleBA);
+                        
+                        // Si es parte de un grupo, distribuir los tanques en formación
+                        if (this.groupId) {
+                            const groupTanks = tanks.filter(tank => 
+                                tank.groupId === this.groupId && 
+                                tank.state === STATES.TRANSITO_SA_SIN
+                            );
+                            
+                            // Formación en línea horizontal
+                            const spacing = 20;
+                            const totalWidth = (groupTanks.length - 1) * spacing;
+                            const startX = baseXBA - totalWidth / 2;
+                            
+                            return {
+                                x: startX + (this.groupIndex * spacing) - 7,
+                                y: baseYBA - 5
+                            };
+                        }
+                        
+                        return {
+                            x: baseXBA - 7,
+                            y: baseYBA - 5
+                        };
+                        
+                    default:
+                        return { x: centerX - 7, y: centerY - 5 };
+                }
+            }
+
+            getStackPosition(location) {
+                const canvas = document.getElementById('simulationCanvas');
+                const centerX = canvas.offsetWidth / 2;
+                
+                let baseX, baseY, tanksAtLocation;
+                
+                if (location === 'singapore') {
+                    baseX = centerX - 100;
+                    baseY = 150;
+                    tanksAtLocation = tanks.filter(tank => 
+                        tank.state === STATES.POOL_ESPERA_SIN || tank.state === STATES.PROCESO_LLENADO || tank.state === STATES.LLENADO_COMPLETADO
+                    );
+                } else {
+                    baseX = centerX - 100;
+                    baseY = 540;
+                    tanksAtLocation = tanks.filter(tank => 
+                        tank.state === STATES.PROCESO_VACIADO || tank.state === STATES.POOL_ESPERA_SA
+                    );
+                }
+                
+                const stackIndex = tanksAtLocation.findIndex(tank => tank.id === this.id);
+                const cols = 12;
+                const row = Math.floor(stackIndex / cols);
+                const col = stackIndex % cols;
+                
+                return {
+                    x: baseX + (col * 17),
+                    y: baseY - (row * 13)
+                };
+            }
+
+            destroy() {
+                if (this.element) {
+                    this.element.remove();
+                    this.element = null;
+                }
+            }
+        }
+
+        function updateParameters() {
+            const oldBufferSecurity = params.bufferSecurity;
+            
+            params.numTanques = Math.max(1, parseInt(document.getElementById('numTanques').value) || 7);
+            params.frecDespacho = Math.max(1, parseInt(document.getElementById('frecDespacho').value) || 10);
+            params.totalTanques = Math.max(50, parseInt(document.getElementById('totalTanques').value) || 109);
+            params.bufferSecurity = Math.max(10, parseInt(document.getElementById('bufferSecurity').value) || 20);
+            params.poolEsperaSIN = Math.max(1, parseInt(document.getElementById('poolEsperaSIN').value) || 10);
+            params.procesoLlenado = Math.max(5, parseInt(document.getElementById('procesoLlenado').value) || 14);
+            params.transitoSINSA = Math.max(30, parseInt(document.getElementById('transitoSINSA').value) || 60);
+            params.procesoVaciado = Math.max(30, parseInt(document.getElementById('procesoVaciado').value) || 60);
+            params.poolEsperaSA = Math.max(5, parseInt(document.getElementById('poolEsperaSA').value) || 14);
+            params.transitoSASIN = Math.max(30, parseInt(document.getElementById('transitoSASIN').value) || 60);
+            params.speed = Math.max(1, parseInt(document.getElementById('speedSlider').value) || 5);
+            
+            document.getElementById('speedValue').textContent = params.speed + 'x';
+            document.getElementById('bufferMinimo').textContent = params.bufferSecurity;
+            document.getElementById('bufferSecurityDisplay').textContent = params.bufferSecurity;
+            
+            // Si cambió el buffer de seguridad, actualizar los tanques inmediatamente
+            if (oldBufferSecurity !== params.bufferSecurity) {
+                updateBufferTanks();
+                // Forzar actualización visual inmediata
+                setTimeout(() => {
+                    tanks.forEach(tank => tank.updateVisual());
+                    updateCounters();
+                }, 50);
+            }
+        }
+
+        function updateCounters() {
+            document.getElementById('dayCounter').textContent = dayCounter;
+            
+            // Contar tanques en cada estado
+            const tanquesPoolSIN = tanks.filter(tank => 
+                tank.state === STATES.POOL_ESPERA_SIN
+            ).length;
+            
+            const tanquesLlenado = tanks.filter(tank => 
+                tank.state === STATES.PROCESO_LLENADO
+            ).length;
+            
+            const tanquesLlenadoCompletado = tanks.filter(tank => 
+                tank.state === STATES.LLENADO_COMPLETADO
+            ).length;
+            
+            const tanquesTransitoLlenos = tanks.filter(tank => 
+                tank.state === STATES.TRANSITO_SIN_SA
+            ).length;
+            
+            const tanquesVaciado = tanks.filter(tank => 
+                tank.state === STATES.PROCESO_VACIADO || tank.state === STATES.POOL_ESPERA_SA
+            ).length;
+            
+            const tanquesTransitoVacios = tanks.filter(tank => 
+                tank.state === STATES.TRANSITO_SA_SIN
+            ).length;
+            
+            // Contar tanques del buffer de seguridad (los primeros 20)
+            const bufferTanksCount = tanks.filter(tank => 
+                tank.isBufferTank
+            ).length;
+            
+            // Verificar estado del buffer
+            const totalTanksInSIN = tanquesPoolSIN + tanquesLlenado + tanquesLlenadoCompletado;
+            const bufferStatus = totalTanksInSIN >= params.bufferSecurity ? '✅' : '⚠️';
+            
+            // Debug: mostrar información en consola
+            console.log(`Pool SIN: ${tanquesPoolSIN}, Llenado: ${tanquesLlenado}, Total SIN: ${totalTanksInSIN}, Buffer: ${bufferTanksCount}, Mínimo: ${params.bufferSecurity}`);
+            
+            document.getElementById('tanquesBuffer').textContent = tanquesPoolSIN;
+            document.getElementById('tanquesLlenado').textContent = tanquesLlenado;
+            document.getElementById('tanquesLlenadoCompletado').textContent = tanquesLlenadoCompletado;
+            document.getElementById('bufferTanksCount').textContent = bufferTanksCount;
+            document.getElementById('tanquesTransitoLlenos').textContent = tanquesTransitoLlenos;
+            document.getElementById('tanquesVaciado').textContent = tanquesVaciado;
+                         document.getElementById('tanquesTransitoVacios').textContent = tanquesTransitoVacios;
+             document.getElementById('tanquesAnuales').textContent = tanksDispatchedThisYear;
+            
+            // Actualizar panel de buffer
+            document.getElementById('bufferStatus').textContent = bufferStatus;
+            document.getElementById('totalSIN').textContent = totalTanksInSIN;
+                         document.getElementById('bufferMinimo').textContent = params.bufferSecurity;
+             document.getElementById('tanquesActualesSIN').textContent = totalTanksInSIN;
+            
+                         // Cambiar color según estado del buffer
+             const bufferStatusElement = document.getElementById('bufferStatus');
+             const tanquesActualesElement = document.getElementById('tanquesActualesSIN');
+             
+             if (totalTanksInSIN >= params.bufferSecurity) {
+                 bufferStatusElement.style.color = '#28a745'; // Verde
+                 tanquesActualesElement.style.color = '#28a745'; // Verde
+             } else {
+                 bufferStatusElement.style.color = '#dc3545'; // Rojo
+                 tanquesActualesElement.style.color = '#dc3545'; // Rojo
+             }
+            
+            // Mostrar alerta si el buffer está bajo
+            if (totalTanksInSIN < params.bufferSecurity) {
+                console.log(`⚠️ ALERTA: Buffer bajo en SIN. Total: ${totalTanksInSIN}, Mínimo requerido: ${params.bufferSecurity}`);
+            }
+            
+                         // Alerta crítica si no hay tanques en SIN
+             if (totalTanksInSIN === 0) {
+                 consecutiveDaysWithoutTanks++;
+                 console.log(`🚨 CRÍTICO: SIN se quedó sin tanques! Día: ${dayCounter} (${consecutiveDaysWithoutTanks} días consecutivos)`);
+                 // Cambiar color del contador total para alertar
+                 document.getElementById('totalSIN').style.color = '#dc3545';
+                 document.getElementById('totalSIN').style.fontWeight = 'bold';
+             } else {
+                 consecutiveDaysWithoutTanks = 0; // Resetear contador
+                 document.getElementById('totalSIN').style.color = '#007bff';
+                 document.getElementById('totalSIN').style.fontWeight = 'normal';
+             }
+             
+             // Mostrar estadísticas anuales cada 30 días
+             if (dayCounter % 30 === 0 && dayCounter > 0) {
+                 const daysInYear = Math.min(dayCounter, 365);
+                 const annualRate = Math.round((tanksDispatchedThisYear / daysInYear) * 365);
+                 console.log(`📊 Estadísticas anuales (día ${dayCounter}): ${tanksDispatchedThisYear} tanques despachados, proyección anual: ${annualRate} tanques`);
+             }
+             
+             // Actualizar panel de métricas del primer año si están disponibles
+             updateFirstYearPanel();
+        }
+
+        function dispatchTanks() {
+            // Verificar si es momento de despachar desde SIN (cada 10 días)
+            if (dayCounter - lastDispatchDay >= params.frecDespacho) {
+                // Primero intentar con tanques no-buffer
+                let availableTanks = tanks.filter(tank => 
+                    tank.state === STATES.LLENADO_COMPLETADO && !tank.isBufferTank
+                );
+                
+                // Si no hay suficientes tanques no-buffer, incluir tanques del buffer
+                if (availableTanks.length < params.numTanques) {
+                    const bufferTanksAvailable = tanks.filter(tank => 
+                        tank.state === STATES.LLENADO_COMPLETADO && tank.isBufferTank
+                    );
+                    availableTanks = availableTanks.concat(bufferTanksAvailable);
+                }
+                
+                // Despachar todos los tanques disponibles, aunque no alcancen el número completo
+                if (availableTanks.length > 0) {
+                    // Seleccionar todos los tanques disponibles (hasta el máximo del grupo)
+                    const tanksToDispatch = availableTanks.slice(0, Math.min(params.numTanques, availableTanks.length));
+                    
+                    // Crear un grupo coordinado de tanques
+                    const groupId = `group_sin_${dayCounter}`;
+                    
+                    tanksToDispatch.forEach((tank, index) => {
+                        tank.state = STATES.TRANSITO_SIN_SA;
+                        tank.daysInState = 0;
+                        tank.groupId = groupId;
+                        tank.groupIndex = index;
+                        tank.updateVisual();
+                    });
+                    
+                                         lastDispatchDay = dayCounter;
+                     
+                     // Contar tanques despachados para el año (ida)
+                     tanksDispatchedThisYear += tanksToDispatch.length;
+                     
+                     // Log del despacho
+                     console.log(`🚢 Despachados ${tanksToDispatch.length} tanques desde SIN (día ${dayCounter}) - Total anual: ${tanksDispatchedThisYear}`);
+                }
+            }
+            
+            // Despachar tanques desde SA (regreso) - también cada 10 días
+            if (dayCounter - lastDispatchDaySA >= params.frecDespacho) {
+                const availableTanksSA = tanks.filter(tank => 
+                    tank.state === STATES.POOL_ESPERA_SA
+                );
+                
+                if (availableTanksSA.length > 0) {
+                    const tanksToDispatchSA = availableTanksSA.slice(0, Math.min(params.numTanques, availableTanksSA.length));
+                    
+                    // Crear un grupo coordinado para el regreso
+                    const groupIdSA = `group_sa_${dayCounter}`;
+                    
+                    tanksToDispatchSA.forEach((tank, index) => {
+                        tank.state = STATES.TRANSITO_SA_SIN;
+                        tank.daysInState = 0;
+                        tank.groupId = groupIdSA;
+                        tank.groupIndex = index;
+                        tank.updateVisual();
+                    });
+                    
+                                         lastDispatchDaySA = dayCounter;
+                     
+                     // Contar tanques despachados para el año (vuelta)
+                     tanksDispatchedThisYear += tanksToDispatchSA.length;
+                     
+                     // Log del despacho desde SA
+                     console.log(`🚢 Despachados ${tanksToDispatchSA.length} tanques desde SA (día ${dayCounter}) - Total anual: ${tanksDispatchedThisYear}`);
+                }
+            }
+        }
+        
+
+        
+        function initializeSimulation() {
+            // Limpiar tanques existentes
+            tanks.forEach(tank => tank.destroy());
+            tanks = [];
+            
+            // Crear tanques iniciales
+            for (let i = 0; i < params.totalTanques; i++) {
+                const tank = new Tank(nextTankId++);
+                tanks.push(tank);
+            }
+            
+            // Asegurar que los elementos visuales se creen antes de actualizar contadores
+            setTimeout(() => {
+                updateCounters();
+            }, 100);
+        }
+        
+                 function updateFirstYearPanel() {
+    const firstYearPanel = document.getElementById('firstYearPanel');
+    if (firstYearMetrics) {
+        firstYearPanel.style.display = 'block';
+        document.getElementById('firstYearTanks').textContent = firstYearMetrics.tanksDispatched;
+        document.getElementById('firstYearDays').textContent = firstYearMetrics.daysElapsed;
+        document.getElementById('firstYearAverage').textContent = firstYearMetrics.averagePerDay;
+        document.getElementById('firstYearProjection').textContent = firstYearMetrics.projectionForYear;
+    } else {
+        firstYearPanel.style.display = 'none'; // Hide the panel if no metrics are available
+    }
+}
+
+        // Funciones para el gráfico de métricas
+        function initializeChart() {
+            chartCanvas = document.getElementById('metricsChart');
+            chartCtx = chartCanvas.getContext('2d');
+            
+            // Configurar tamaño del canvas
+            const container = chartCanvas.parentElement;
+            chartCanvas.width = container.offsetWidth - 40;
+            chartCanvas.height = 400;
+            
+            console.log('📊 Gráfico inicializado');
+        }
+
+        function collectChartData() {
+            // Ya no necesitamos recolectar datos históricos
+            // Los datos actuales se obtienen directamente en drawChart()
+            console.log('📊 Actualizando gráfico con datos actuales');
+        }
+
+        function drawChart() {
+            if (!chartCtx) return;
+            
+            const canvas = chartCanvas;
+            const ctx = chartCtx;
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            // Limpiar canvas
+            ctx.clearRect(0, 0, width, height);
+            
+            // Configurar colores para cada etapa
+            const colors = {
+                poolSIN: '#6c757d',
+                llenado: '#ffc107',
+                llenadoCompletado: '#ff9800',
+                buffer: '#28a745',
+                transitoLlenos: '#007bff',
+                enSA: '#fd7e14',
+                transitoVacios: '#6f42c1'
+            };
+            
+            // Etiquetas de las etapas
+            const stages = [
+                'Pool SIN\n(Vacíos)',
+                'En Proceso\nLlenado SIN',
+                'Llenado\nCompletado',
+                'Buffer\nSeguridad',
+                'Tránsito\nSIN→SA',
+                'En SA\n(Vaciado)',
+                'Tránsito\nSA→SIN'
+            ];
+            
+            // Obtener datos actuales
+            const currentData = {
+                poolSIN: tanks.filter(t => t.state === STATES.POOL_ESPERA_SIN && !t.isBufferTank).length,
+                llenado: tanks.filter(t => t.state === STATES.PROCESO_LLENADO).length,
+                llenadoCompletado: tanks.filter(t => t.state === STATES.LLENADO_COMPLETADO).length,
+                buffer: tanks.filter(t => t.isBufferTank).length,
+                transitoLlenos: tanks.filter(t => t.state === STATES.TRANSITO_SIN_SA).length,
+                enSA: tanks.filter(t => t.state === STATES.PROCESO_VACIADO || t.state === STATES.POOL_ESPERA_SA).length,
+                transitoVacios: tanks.filter(t => t.state === STATES.TRANSITO_SA_SIN).length
+            };
+            
+            const values = [
+                currentData.poolSIN,
+                currentData.llenado,
+                currentData.llenadoCompletado,
+                currentData.buffer,
+                currentData.transitoLlenos,
+                currentData.enSA,
+                currentData.transitoVacios
+            ];
+            
+            // Obtener el valor máximo para escalar
+            const maxValue = Math.max(...values, 1);
+            const scaleY = (height - 120) / maxValue;
+            
+            const barWidth = 60; // Ancho de cada barra
+            const barSpacing = 40; // Espacio entre barras
+            const startX = 80; // Posición inicial X
+            
+            // Dibujar cuadrícula
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 10; i++) {
+                const y = 60 + (i * (height - 120) / 10);
+                ctx.beginPath();
+                ctx.moveTo(60, y);
+                ctx.lineTo(width - 40, y);
+                ctx.stroke();
+            }
+            
+            // Dibujar barras para cada etapa
+            stages.forEach((stage, index) => {
+                const x = startX + (index * (barWidth + barSpacing));
+                const value = values[index];
+                const barHeight = value * scaleY;
+                
+                // Dibujar barra
+                ctx.fillStyle = colors[Object.keys(colors)[index]];
+                ctx.fillRect(x, height - 80 - barHeight, barWidth, barHeight);
+                
+                // Borde de la barra
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(x, height - 80 - barHeight, barWidth, barHeight);
+                
+                // Valor en la barra
+                if (barHeight > 20) {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 12px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(value, x + barWidth/2, height - 80 - barHeight/2 + 4);
+                }
+                
+                // Etiqueta de la etapa
+                ctx.fillStyle = '#333';
+                ctx.font = '10px Arial';
+                ctx.textAlign = 'center';
+                const lines = stage.split('\n');
+                lines.forEach((line, lineIndex) => {
+                    ctx.fillText(line, x + barWidth/2, height - 60 + (lineIndex * 12));
+                });
+            });
+            
+            // Dibujar ejes
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(60, 60);
+            ctx.lineTo(60, height - 80);
+            ctx.lineTo(width - 40, height - 80);
+            ctx.stroke();
+            
+            // Etiquetas del eje Y
+            ctx.fillStyle = '#333';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'right';
+            for (let i = 0; i <= 10; i++) {
+                const y = 60 + (i * (height - 120) / 10);
+                const value = Math.round((maxValue * (10 - i)) / 10);
+                ctx.fillText(value, 55, y + 4);
+            }
+            
+            // Título del gráfico
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Distribución Actual de Tanques por Etapa - Día ${dayCounter}`, width / 2, 35);
+        }
+
+        function updateChart() {
+            drawChart();
+        }
+
+        function toggleChartAutoUpdate() {
+            chartAutoUpdate = !chartAutoUpdate;
+            const btn = document.getElementById('chartAutoBtn');
+            
+            if (chartAutoUpdate) {
+                btn.textContent = '▶️ Auto-actualización';
+                btn.classList.add('active');
+                chartUpdateInterval = setInterval(updateChart, 2000); // Actualizar cada 2 segundos
+                console.log('📊 Auto-actualización del gráfico activada');
+            } else {
+                btn.textContent = '⏸️ Auto-actualización';
+                btn.classList.remove('active');
+                if (chartUpdateInterval) {
+                    clearInterval(chartUpdateInterval);
+                    chartUpdateInterval = null;
+                }
+                console.log('📊 Auto-actualización del gráfico desactivada');
+            }
+        }
+
+        function clearChartData() {
+            // Ya no tenemos datos históricos que limpiar
+            drawChart();
+            console.log('🗑️ Gráfico actualizado');
+        }
+         
+         function updateBufferTanks() {
+            console.log(`🔄 Actualizando buffer: ${params.bufferSecurity} tanques`);
+            
+            // Actualizar la propiedad isBufferTank de todos los tanques
+            let changedCount = 0;
+            tanks.forEach(tank => {
+                const wasBufferTank = tank.isBufferTank;
+                tank.isBufferTank = tank.id < params.bufferSecurity;
+                
+                // Solo actualizar visual si cambió el estado del buffer
+                if (wasBufferTank !== tank.isBufferTank) {
+                    changedCount++;
+                    tank.updateVisual();
+                }
+            });
+            
+            // Actualizar contadores para reflejar el cambio inmediatamente
+            updateCounters();
+            
+            console.log(`✅ Buffer actualizado: ${params.bufferSecurity} tanques marcados como buffer (${changedCount} tanques cambiaron)`);
+        }
+
+                 function runSimulation() {
+             if (!isRunning) return;
+             
+             dayCounter++;
+             
+             // Reiniciar contador anual cada 365 días
+             if (dayCounter - lastYearReset >= 365) {
+                 // Guardar métricas del primer año
+                 if (currentYear === 1 && firstYearMetrics === null) {
+                     firstYearMetrics = {
+                         year: currentYear,
+                         tanksDispatched: tanksDispatchedThisYear,
+                         daysElapsed: dayCounter,
+                         averagePerDay: Math.round((tanksDispatchedThisYear / dayCounter) * 100) / 100,
+                         projectionForYear: Math.round((tanksDispatchedThisYear / dayCounter) * 365)
+                     };
+                     console.log(`📊 MÉTRICAS DEL PRIMER AÑO GUARDADAS:`);
+                     console.log(`   • Tanques despachados: ${firstYearMetrics.tanksDispatched}`);
+                     console.log(`   • Días transcurridos: ${firstYearMetrics.daysElapsed}`);
+                     console.log(`   • Promedio por día: ${firstYearMetrics.averagePerDay}`);
+                     console.log(`   • Proyección anual: ${firstYearMetrics.projectionForYear}`);
+                 }
+                 
+                 tanksDispatchedThisYear = 0;
+                 lastYearReset = dayCounter;
+                 currentYear++;
+                 console.log(`📅 Año ${currentYear} iniciado. Contador anual reiniciado.`);
+             }
+            
+            // Actualizar todos los tanques
+            tanks.forEach(tank => tank.update());
+            
+            // Despachar tanques si corresponde
+            dispatchTanks();
+            
+            // Actualizar contadores
+            updateCounters();
+            
+            // Actualizar gráfico si está habilitado
+            if (chartAutoUpdate) {
+                updateChart();
+            }
+            
+            // Programar siguiente iteración
+            simulationInterval = setTimeout(runSimulation, 1000 / params.speed);
+        }
+
+        function startSimulation() {
+            if (isRunning) return;
+            
+            isRunning = true;
+            document.getElementById('playBtn').textContent = '⏸️ Pausar';
+            document.getElementById('playBtn').classList.add('pause');
+            
+            runSimulation();
+        }
+
+        function pauseSimulation() {
+            if (!isRunning) return;
+            
+            isRunning = false;
+            document.getElementById('playBtn').textContent = '▶️ Iniciar';
+            document.getElementById('playBtn').classList.remove('pause');
+            
+            if (simulationInterval) {
+                clearTimeout(simulationInterval);
+                simulationInterval = null;
+            }
+        }
+
+        function resetSimulation() {
+            pauseSimulation();
+            
+            dayCounter = 0;
+            lastDispatchDay = 0;
+            lastDispatchDaySA = 0; // Reiniciar contador de despacho desde SA
+                         nextTankId = 0;
+             
+             consecutiveDaysWithoutTanks = 0; // Reiniciar contador de días consecutivos sin tanques
+             tanksDispatchedThisYear = 0; // Reiniciar contador anual
+             lastYearReset = 0; // Reiniciar día de reinicio anual
+             firstYearMetrics = null; // Reiniciar métricas del primer año
+             currentYear = 1; // Reiniciar año actual
+            
+            // Limpiar datos del gráfico
+            clearChartData();
+            
+            initializeSimulation();
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar simulación
+            initializeSimulation();
+            
+            // Inicializar gráfico
+            initializeChart();
+            
+            // Event listeners para controles
+            document.getElementById('playBtn').addEventListener('click', function() {
+                if (isRunning) {
+                    pauseSimulation();
+                } else {
+                    startSimulation();
+                }
+            });
+            
+            document.getElementById('resetBtn').addEventListener('click', resetSimulation);
+            
+            // Event listeners para parámetros (excluyendo el buffer)
+            const inputs = document.querySelectorAll('input[type="number"]');
+            inputs.forEach(input => {
+                if (input.id !== 'bufferSecurity') {
+                    input.addEventListener('change', function() {
+                        updateParameters();
+                        // Reinicializar simulación si no está corriendo
+                        if (!isRunning) {
+                            initializeSimulation();
+                        }
+                    });
+                }
+            });
+            
+            // Event listener específico para el buffer que se ejecute inmediatamente
+            document.getElementById('bufferSecurity').addEventListener('input', function() {
+                const oldBufferSecurity = params.bufferSecurity;
+                const newValue = Math.max(10, parseInt(this.value) || 20);
+                params.bufferSecurity = newValue;
+                
+                console.log(`🔄 Cambio de buffer detectado: ${oldBufferSecurity} → ${newValue}`);
+                
+                if (oldBufferSecurity !== newValue) {
+                    updateBufferTanks();
+                    document.getElementById('bufferSecurityDisplay').textContent = newValue;
+                    document.getElementById('bufferMinimo').textContent = newValue;
+                    
+                    // Forzar actualización visual inmediata
+                    setTimeout(() => {
+                        tanks.forEach(tank => tank.updateVisual());
+                        updateCounters();
+                    }, 10);
+                }
+            });
+            
+            document.getElementById('speedSlider').addEventListener('input', function() {
+                updateParameters();
+                if (isRunning) {
+                    pauseSimulation();
+                    startSimulation();
+                }
+            });
+            
+            // Event listeners para el gráfico
+            document.getElementById('chartToggleBtn').addEventListener('click', updateChart);
+            document.getElementById('chartAutoBtn').addEventListener('click', toggleChartAutoUpdate);
+            document.getElementById('chartClearBtn').addEventListener('click', clearChartData);
+            
+            // Actualizar parámetros iniciales
+            updateParameters();
+            
+                         // Actualizar contadores después de la inicialización
+             setTimeout(() => {
+                 updateCounters();
+                 updateFirstYearPanel();
+             }, 200);
+        });
+    </script>
+</body>
+</html>
