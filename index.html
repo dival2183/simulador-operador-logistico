@@ -21,6 +21,7 @@
 
         .container {
             max-width: 1500px;
+            width: 95%;
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
@@ -211,6 +212,36 @@
             z-index: 10;
         }
 
+        .flow-title {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #28a745;
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            min-width: 120px;
+            text-align: center;
+            font-weight: bold;
+            z-index: 15;
+            font-size: 0.9rem;
+        }
+
+        .full-line-title {
+            top: 50%;
+            right: 5%;
+            transform: translateY(-50%);
+            border-color: #007bff;
+            background: rgba(0, 123, 255, 0.1);
+        }
+
+        .empty-line-title {
+            top: 50%;
+            left: 5%;
+            transform: translateY(-50%);
+            border-color: #6c757d;
+            background: rgba(108, 117, 125, 0.1);
+        }
+
         .location.singapore {
             top: 60px;
             left: 50%;
@@ -351,21 +382,232 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 20px;
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .logo {
+                max-height: 60px;
+                max-width: 150px;
+            }
+            
             .control-panel {
                 grid-template-columns: 1fr;
+                gap: 15px;
             }
             
             .status-panel {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .simulation-canvas {
+                height: 500px;
+                margin-bottom: 15px;
             }
             
             .route-circle {
-                width: 350px;
-                height: 350px;
+                width: 300px;
+                height: 300px;
             }
-
+            
+            .flow-title {
+                min-width: 100px;
+                padding: 8px;
+                font-size: 0.8rem;
+            }
+            
+            .full-line-title {
+                right: 2%;
+                min-width: 90px;
+            }
+            
+            .empty-line-title {
+                left: 2%;
+                min-width: 90px;
+            }
+            
+            .location {
+                min-width: 120px;
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+            
+            .location.singapore {
+                top: 40px;
+            }
+            
+            .location.san-antonio {
+                bottom: 40px;
+            }
+            
             .cycle-stages {
                 grid-template-columns: 1fr;
+            }
+            
+            .legend {
+                gap: 15px;
+                padding: 10px;
+            }
+            
+            .chart-container {
+                padding: 15px;
+            }
+            
+            .chart-canvas {
+                height: 300px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 5px;
+            }
+            
+            .container {
+                padding: 15px;
+                margin: 5px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .header p {
+                font-size: 0.9rem;
+            }
+            
+            .logo {
+                max-height: 50px;
+                max-width: 120px;
+            }
+            
+            .simulation-canvas {
+                height: 400px;
+            }
+            
+            .route-circle {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .flow-title {
+                min-width: 80px;
+                padding: 6px;
+                font-size: 0.7rem;
+            }
+            
+            .full-line-title {
+                right: 1%;
+                min-width: 75px;
+            }
+            
+            .empty-line-title {
+                left: 1%;
+                min-width: 75px;
+            }
+            
+            .location {
+                min-width: 100px;
+                padding: 10px;
+                font-size: 0.8rem;
+            }
+            
+            .control-section {
+                padding: 15px;
+            }
+            
+            .param-group {
+                grid-template-columns: 1fr 60px;
+                gap: 6px;
+            }
+            
+            .status-panel {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-controls {
+                gap: 10px;
+            }
+            
+            .chart-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .container {
+                width: 98%;
+                padding: 10px;
+                margin: 2px;
+            }
+            
+            .simulation-canvas {
+                height: 350px;
+            }
+            
+            .route-circle {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .flow-title {
+                min-width: 70px;
+                padding: 4px;
+                font-size: 0.65rem;
+            }
+            
+            .full-line-title {
+                right: 0.5%;
+                min-width: 65px;
+            }
+            
+            .empty-line-title {
+                left: 0.5%;
+                min-width: 65px;
+            }
+            
+            .location {
+                min-width: 80px;
+                padding: 8px;
+                font-size: 0.75rem;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .header p {
+                font-size: 0.8rem;
+            }
+            
+            .status-panel {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .control-section {
+                padding: 12px;
             }
         }
 
@@ -619,6 +861,18 @@
         <!-- Canvas de Simulación -->
         <div class="simulation-canvas" id="simulationCanvas">
             <div class="route-circle"></div>
+            
+            <!-- Título Full Line (lado derecho) -->
+            <div class="flow-title full-line-title">
+                <div>🚢 FULL LINE</div>
+                <div style="font-size: 0.8rem; margin-top: 5px;">Tanques Llenos</div>
+            </div>
+            
+            <!-- Título Empty Line (lado izquierdo) -->
+            <div class="flow-title empty-line-title">
+                <div>📦 EMPTY LINE</div>
+                <div style="font-size: 0.8rem; margin-top: 5px;">Tanques Vacíos</div>
+            </div>
             
             <div class="location singapore">
                 <div>🇸🇬 SINGAPUR (SIN)</div>
