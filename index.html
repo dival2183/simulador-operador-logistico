@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulación Operador Logístico</title>
+    <title>Logistics Operator Simulation</title>
     <style>
         * {
             margin: 0;
@@ -691,277 +691,277 @@
 <body>
     <div class="container">
         <div class="header">
-            <img src="images/LOGO.jpg" alt="Logo Corporativo" class="logo">
+            <img src="images/LOGO.jpg" alt="Corporate Logo" class="logo">
             <div class="header-content">
-                <h1>🚢 Simulación Operador Logístico</h1>
-                <p>Transporte de Tanques: Singapur ↔ Puerto San Antonio | Total: 109 Tanques</p>
+                <h1>🚢 Logistics Operator Simulation</h1>
+                <p>Tank Transport: Singapore ↔ Port San Antonio | Total: 109 Tanks</p>
             </div>
         </div>
 
         <!-- Panel de Control -->
         <div class="control-panel">
             <div class="control-section">
-                <h3>📦 Parámetros Operativos</h3>
+                <h3>📦 Operational Parameters</h3>
                 <div class="param-group">
-                    <label>Tanques por despacho:</label>
+                    <label>Tanks per dispatch:</label>
                     <input type="number" id="numTanques" value="7" min="1" max="20">
                 </div>
                 <div class="param-group">
-                    <label>Frecuencia despacho:</label>
+                    <label>Dispatch frequency:</label>
                     <input type="number" id="frecDespacho" value="10" min="1" max="30">
                 </div>
                 <div class="param-group">
-                    <label>Total tanques circuito:</label>
+                    <label>Total circuit tanks:</label>
                     <input type="number" id="totalTanques" value="109" min="50" max="200">
                 </div>
                 <div class="param-group">
-                    <label>Buffer seguridad SIN:</label>
+                    <label>SIN security buffer:</label>
                     <input type="number" id="bufferSecurity" value="20" min="10" max="50">
                 </div>
             </div>
 
             <div class="control-section">
-                <h3>⏱️ Tiempos en Singapur</h3>
+                <h3>⏱️ Singapore Times</h3>
                 <div class="param-group">
-                    <label>Pool espera (días):</label>
+                    <label>Waiting pool (days):</label>
                     <input type="number" id="poolEsperaSIN" value="10" min="1" max="30">
                 </div>
                 <div class="param-group">
-                    <label>Proceso llenado:</label>
+                    <label>Filling process:</label>
                     <input type="number" id="procesoLlenado" value="14" min="5" max="30">
                 </div>
             </div>
 
             <div class="control-section">
-                <h3>🚢 Tiempos de Tránsito</h3>
+                <h3>🚢 Transit Times</h3>
                 <div class="param-group">
-                    <label>SIN → SA (llenos):</label>
+                    <label>SIN → SA (full):</label>
                     <input type="number" id="transitoSINSA" value="60" min="30" max="120">
                 </div>
                 <div class="param-group">
-                    <label>SA → SIN (vacíos):</label>
+                    <label>SA → SIN (empty):</label>
                     <input type="number" id="transitoSASIN" value="60" min="30" max="120">
                 </div>
             </div>
 
             <div class="control-section">
-                <h3>⏱️ Tiempos en San Antonio</h3>
+                <h3>⏱️ San Antonio Times</h3>
                 <div class="param-group">
-                    <label>Proceso vaciado:</label>
+                    <label>Emptying process:</label>
                     <input type="number" id="procesoVaciado" value="60" min="30" max="120">
                 </div>
                 <div class="param-group">
-                    <label>Pool espera SA:</label>
+                    <label>SA waiting pool:</label>
                     <input type="number" id="poolEsperaSA" value="14" min="5" max="30">
                 </div>
                 <div class="speed-control">
-                    <label>Velocidad:</label>
+                    <label>Speed:</label>
                     <input type="range" id="speedSlider" class="speed-slider" min="1" max="15" value="5">
                     <span id="speedValue">5x</span>
                 </div>
                 <div class="simulation-controls">
-                    <button class="control-btn" id="playBtn">▶️ Iniciar</button>
+                    <button class="control-btn" id="playBtn">▶️ Start</button>
                     <button class="control-btn reset" id="resetBtn">🔄 Reset</button>
                 </div>
             </div>
         </div>
 
-        <!-- Panel de Estado -->
+        <!-- Status Panel -->
         <div class="status-panel">
             <div class="status-card">
                 <div class="status-value" id="dayCounter">0</div>
-                <div class="status-label">Días Transcurridos</div>
+                <div class="status-label">Days Elapsed</div>
             </div>
             <div class="status-card">
                 <div class="status-value" id="tanquesBuffer">0</div>
-                <div class="status-label">Tanques en Pool<br>SIN (Vacíos)</div>
+                <div class="status-label">Tanks in Pool<br>SIN (Empty)</div>
             </div>
             <div class="status-card">
                 <div class="status-value" id="tanquesLlenado">0</div>
-                <div class="status-label">En Proceso<br>Llenado SIN</div>
+                <div class="status-label">In Process<br>Filling SIN</div>
             </div>
             <div class="status-card">
                 <div class="status-value" id="tanquesLlenadoCompletado">0</div>
-                <div class="status-label">Llenado<br>Completado</div>
+                <div class="status-label">Filling<br>Completed</div>
             </div>
             <div class="status-card">
                 <div class="status-value" id="bufferTanksCount">0</div>
-                <div class="status-label">🛡️ Buffer<br>Seguridad</div>
+                <div class="status-label">🛡️ Security<br>Buffer</div>
             </div>
             <div class="status-card">
                 <div class="status-value" id="tanquesTransitoLlenos">0</div>
-                <div class="status-label">Tránsito SIN→SA<br>(Llenos)</div>
+                <div class="status-label">Transit SIN→SA<br>(Full)</div>
             </div>
             <div class="status-card">
                 <div class="status-value" id="tanquesVaciado">0</div>
-                <div class="status-label">En SA<br>(Vaciado + Espera)</div>
+                <div class="status-label">At SA<br>(Emptying + Wait)</div>
             </div>
                          <div class="status-card">
                  <div class="status-value" id="tanquesTransitoVacios">0</div>
-                 <div class="status-label">Tránsito SA→SIN<br>(Vacíos)</div>
+                 <div class="status-label">Transit SA→SIN<br>(Empty)</div>
              </div>
              <div class="status-card" style="background: linear-gradient(135deg, #28a745, #20c997); color: white;">
                  <div class="status-value" id="tanquesAnuales" style="color: white;">0</div>
-                 <div class="status-label" style="color: white;">Tanques en Tránsito<br>Este Año (Ida + Vuelta)</div>
+                 <div class="status-label" style="color: white;">Tanks in Transit<br>This Year (Round Trip)</div>
              </div>
          </div>
 
-                 <!-- Panel de Métricas del Primer Año -->
+                 <!-- First Year Metrics Panel -->
          <div class="cycle-info" id="firstYearPanel" style="margin-bottom: 20px; display: none;">
-             <h3>📊 Métricas del Primer Año</h3>
+             <h3>📊 First Year Metrics</h3>
              <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 15px;">
                  <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #28a745;">
                      <div style="font-size: 1.5rem; font-weight: bold; color: #28a745;" id="firstYearTanks">0</div>
-                     <div style="font-size: 0.9rem; color: #666;">Tanques Despachados</div>
+                     <div style="font-size: 0.9rem; color: #666;">Tanks Dispatched</div>
                  </div>
                  <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #28a745;">
                      <div style="font-size: 1.5rem; font-weight: bold; color: #28a745;" id="firstYearDays">0</div>
-                     <div style="font-size: 0.9rem; color: #666;">Días Transcurridos</div>
+                     <div style="font-size: 0.9rem; color: #666;">Days Elapsed</div>
                  </div>
                  <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #28a745;">
                      <div style="font-size: 1.5rem; font-weight: bold; color: #28a745;" id="firstYearAverage">0</div>
-                     <div style="font-size: 0.9rem; color: #666;">Promedio/Día</div>
+                     <div style="font-size: 0.9rem; color: #666;">Average/Day</div>
                  </div>
                  <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #28a745;">
                      <div style="font-size: 1.5rem; font-weight: bold; color: #28a745;" id="firstYearProjection">0</div>
-                     <div style="font-size: 0.9rem; color: #666;">Proyección Anual</div>
+                     <div style="font-size: 0.9rem; color: #666;">Annual Projection</div>
                  </div>
              </div>
          </div>
 
-         <!-- Panel de Información del Buffer -->
+         <!-- Buffer Information Panel -->
          <div class="cycle-info" style="margin-bottom: 20px;">
-            <h3>🛡️ Estado del Buffer de Seguridad</h3>
+            <h3>🛡️ Security Buffer Status</h3>
                          <p style="text-align: center; color: #666; margin-bottom: 15px; font-size: 0.9rem;">
-                 Los primeros <strong id="bufferSecurityDisplay">20</strong> tanques (en verde) son el buffer de seguridad.<br>
-                 <strong>⚠️ IMPORTANTE:</strong> "Tanques Actuales en SIN" muestra cuántos tanques hay disponibles actualmente.<br>
-                 <em>Ajusta el "Buffer seguridad SIN" para mantener suficientes tanques en SIN.</em>
+                 The first <strong id="bufferSecurityDisplay">20</strong> tanks (in green) are the security buffer.<br>
+                 <strong>⚠️ IMPORTANT:</strong> "Current Tanks in SIN" shows how many tanks are currently available.<br>
+                 <em>Adjust the "SIN security buffer" to maintain sufficient tanks in SIN.</em>
              </p>
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px;">
                 <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #e0e0e0;">
                     <div style="font-size: 1.5rem; font-weight: bold; color: #007bff;" id="bufferStatus">✅</div>
-                    <div style="font-size: 0.9rem; color: #666;">Estado Buffer</div>
+                    <div style="font-size: 0.9rem; color: #666;">Buffer Status</div>
                 </div>
                 <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #e0e0e0;">
                     <div style="font-size: 1.5rem; font-weight: bold; color: #007bff;" id="totalSIN">0</div>
-                    <div style="font-size: 0.9rem; color: #666;">Total en SIN</div>
+                    <div style="font-size: 0.9rem; color: #666;">Total in SIN</div>
                 </div>
                 <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #e0e0e0;">
                     <div style="font-size: 1.5rem; font-weight: bold; color: #007bff;" id="bufferMinimo">20</div>
-                    <div style="font-size: 0.9rem; color: #666;">Mínimo Requerido</div>
+                    <div style="font-size: 0.9rem; color: #666;">Minimum Required</div>
                 </div>
                                  <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; border: 2px solid #e0e0e0;">
                      <div style="font-size: 1.5rem; font-weight: bold; color: #007bff;" id="tanquesActualesSIN">0</div>
-                     <div style="font-size: 0.9rem; color: #666;">Tanques Actuales<br>en SIN</div>
+                     <div style="font-size: 0.9rem; color: #666;">Current Tanks<br>in SIN</div>
                  </div>
 
             </div>
         </div>
 
-        <!-- Canvas de Simulación -->
+        <!-- Simulation Canvas -->
         <div class="simulation-canvas" id="simulationCanvas">
             <div class="route-circle"></div>
             
-            <!-- Título Full Line (lado derecho) -->
+            <!-- Full Line Title (right side) -->
             <div class="flow-title full-line-title">
                 <div>🚢 FULL LINE</div>
-                <div style="font-size: 0.8rem; margin-top: 5px;">Tanques Llenos</div>
+                <div style="font-size: 0.8rem; margin-top: 5px;">Full Tanks</div>
             </div>
             
-            <!-- Título Empty Line (lado izquierdo) -->
+            <!-- Empty Line Title (left side) -->
             <div class="flow-title empty-line-title">
                 <div>📦 EMPTY LINE</div>
-                <div style="font-size: 0.8rem; margin-top: 5px;">Tanques Vacíos</div>
+                <div style="font-size: 0.8rem; margin-top: 5px;">Empty Tanks</div>
             </div>
             
             <div class="location singapore">
-                <div>🇸🇬 SINGAPUR (SIN)</div>
-                <div style="font-size: 0.8rem; margin-top: 5px;">Punto A - Origen</div>
+                <div>🇸🇬 SINGAPORE (SIN)</div>
+                <div style="font-size: 0.8rem; margin-top: 5px;">Point A - Origin</div>
             </div>
             
             <div class="location san-antonio">
                 <div>🇨🇱 SAN ANTONIO (SA)</div>
-                <div style="font-size: 0.8rem; margin-top: 5px;">Punto B - Destino</div>
+                <div style="font-size: 0.8rem; margin-top: 5px;">Point B - Destination</div>
             </div>
         </div>
 
-        <!-- Leyenda -->
+        <!-- Legend -->
         <div class="legend">
             <div class="legend-item">
                 <div class="legend-tank buffer"></div>
-                <span>🛡️ Buffer de Seguridad (Verde)</span>
+                <span>🛡️ Security Buffer (Green)</span>
             </div>
             <div class="legend-item">
                 <div class="legend-tank full"></div>
-                <span>Tanques Llenos (Azul)</span>
+                <span>Full Tanks (Blue)</span>
             </div>
             <div class="legend-item">
                 <div class="legend-tank empty"></div>
-                <span>Tanques en SA (Blancos)</span>
+                <span>Tanks in SA (White)</span>
             </div>
             <div class="legend-item">
-                <span>🚢 Tránsito Marítimo</span>
+                <span>🚢 Maritime Transit</span>
             </div>
             <div class="legend-item">
-                <span>⚙️ Procesamiento</span>
+                <span>⚙️ Processing</span>
             </div>
         </div>
 
-                 <!-- Información del Ciclo -->
+                 <!-- Cycle Information -->
          <div class="cycle-info">
-             <h3>📋 Etapas del Ciclo Operativo</h3>
+             <h3>📋 Operational Cycle Stages</h3>
              
-             <!-- Panel de Recomendaciones -->
+             <!-- Recommendations Panel -->
              <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-                 <h4 style="color: #856404; margin-bottom: 10px;">💡 Recomendaciones para Ajustar el Buffer:</h4>
+                 <h4 style="color: #856404; margin-bottom: 10px;">💡 Recommendations for Buffer Adjustment:</h4>
                                    <ul style="color: #856404; font-size: 0.9rem; margin: 0; padding-left: 20px;">
-                      <li><strong>Buffer muy bajo:</strong> Si "Tanques Actuales en SIN" se mantiene bajo, incrementa el "Buffer seguridad SIN"</li>
-                      <li><strong>Buffer óptimo:</strong> Si "Tanques Actuales en SIN" se mantiene estable, tu configuración es buena</li>
-                      <li><strong>Buffer muy alto:</strong> Si "Tanques Actuales en SIN" siempre es alto, puedes reducirlo para optimizar recursos</li>
-                      <li><strong>Sin tanques en SIN:</strong> Si "Tanques Actuales en SIN" llega a 0, el buffer es insuficiente</li>
-                      <li><strong>Objetivo:</strong> Encontrar el mínimo buffer que mantenga suficientes tanques en SIN</li>
+                      <li><strong>Buffer too low:</strong> If "Current Tanks in SIN" remains low, increase the "SIN security buffer"</li>
+                     <li><strong>Optimal buffer:</strong> If "Current Tanks in SIN" remains stable, your configuration is good</li>
+                     <li><strong>Buffer too high:</strong> If "Current Tanks in SIN" is always high, you can reduce it to optimize resources</li>
+                     <li><strong>No tanks in SIN:</strong> If "Current Tanks in SIN" reaches 0, the buffer is insufficient</li>
+                     <li><strong>Goal:</strong> Find the minimum buffer that maintains sufficient tanks in SIN</li>
                   </ul>
              </div>
             <div class="cycle-stages">
                 <div class="stage">
-                    <div class="stage-title">1. Pool Espera SIN</div>
-                    <div class="stage-days">10 días (Buffer)</div>
+                    <div class="stage-title">1. SIN Waiting Pool</div>
+                    <div class="stage-days">10 days (Buffer)</div>
                 </div>
                 <div class="stage">
-                    <div class="stage-title">2. Proceso Llenado</div>
-                    <div class="stage-days">14 días</div>
+                    <div class="stage-title">2. Filling Process</div>
+                    <div class="stage-days">14 days</div>
                 </div>
                 <div class="stage">
-                    <div class="stage-title">3. Tránsito SIN→SA</div>
-                    <div class="stage-days">60 días (Llenos)</div>
+                    <div class="stage-title">3. Transit SIN→SA</div>
+                    <div class="stage-days">60 days (Full)</div>
                 </div>
                 <div class="stage">
-                    <div class="stage-title">4. Proceso Vaciado</div>
-                    <div class="stage-days">60 días</div>
+                    <div class="stage-title">4. Emptying Process</div>
+                    <div class="stage-days">60 days</div>
                 </div>
                 <div class="stage">
-                    <div class="stage-title">5. Pool Espera SA</div>
-                    <div class="stage-days">14 días</div>
+                    <div class="stage-title">5. SA Waiting Pool</div>
+                    <div class="stage-days">14 days</div>
                 </div>
                 <div class="stage">
-                    <div class="stage-title">6. Tránsito SA→SIN</div>
-                    <div class="stage-days">60 días (Vacíos)</div>
+                    <div class="stage-title">6. Transit SA→SIN</div>
+                    <div class="stage-days">60 days (Empty)</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Gráfico de Barras para Métricas -->
+    <!-- Bar Chart for Metrics -->
     <div class="chart-container">
                      <div class="chart-header">
-                 <h3>📊 Gráfico de Distribución Actual</h3>
-                 <p>Visualización de la cantidad de tanques en cada etapa del proceso</p>
+                                      <h3>📊 Current Distribution Chart</h3>
+                 <p>Visualization of the number of tanks at each stage of the process</p>
              </div>
         
         <div class="chart-controls">
-                             <button class="chart-btn active" id="chartToggleBtn">🔄 Actualizar Gráfico</button>
-                 <button class="chart-btn" id="chartAutoBtn">⏸️ Auto-actualización</button>
-                 <button class="chart-btn" id="chartClearBtn">🔄 Refrescar</button>
+                             <button class="chart-btn active" id="chartToggleBtn">🔄 Update Chart</button>
+                 <button class="chart-btn" id="chartAutoBtn">⏸️ Auto-update</button>
+                 <button class="chart-btn" id="chartClearBtn">🔄 Refresh</button>
         </div>
         
         <canvas id="metricsChart" class="chart-canvas"></canvas>
@@ -969,31 +969,31 @@
         <div class="chart-legend">
             <div class="chart-legend-item">
                 <div class="chart-legend-color" style="background: #6c757d;"></div>
-                <span>Tanques en Pool SIN (Vacíos)</span>
+                <span>Tanks in SIN Pool (Empty)</span>
             </div>
             <div class="chart-legend-item">
                 <div class="chart-legend-color" style="background: #ffc107;"></div>
-                <span>En Proceso Llenado SIN</span>
+                <span>In SIN Filling Process</span>
             </div>
             <div class="chart-legend-item">
                 <div class="chart-legend-color" style="background: #ff9800;"></div>
-                <span>Llenado Completado</span>
+                <span>Filling Completed</span>
             </div>
             <div class="chart-legend-item">
                 <div class="chart-legend-color" style="background: #28a745;"></div>
-                <span>🛡️ Buffer Seguridad</span>
+                <span>🛡️ Security Buffer</span>
             </div>
             <div class="chart-legend-item">
                 <div class="chart-legend-color" style="background: #007bff;"></div>
-                <span>Tránsito SIN→SA (Llenos)</span>
+                <span>Transit SIN→SA (Full)</span>
             </div>
             <div class="chart-legend-item">
                 <div class="chart-legend-color" style="background: #fd7e14;"></div>
-                <span>En SA (Vaciado + Espera)</span>
+                <span>At SA (Emptying + Wait)</span>
             </div>
             <div class="chart-legend-item">
                 <div class="chart-legend-color" style="background: #6f42c1;"></div>
-                <span>Tránsito SA→SIN (Vacíos)</span>
+                <span>Transit SA→SIN (Empty)</span>
             </div>
         </div>
     </div>
@@ -1313,11 +1313,11 @@
             document.getElementById('bufferSecurityDisplay').textContent = params.bufferSecurity;
             
             // Debug: mostrar los nuevos valores en consola
-            console.log(`📊 Parámetros actualizados:`);
-            console.log(`   • Proceso Vaciado: ${params.procesoVaciado} días`);
-            console.log(`   • Pool Espera SA: ${params.poolEsperaSA} días`);
-            console.log(`   • Proceso Llenado: ${params.procesoLlenado} días`);
-            console.log(`   • Pool Espera SIN: ${params.poolEsperaSIN} días`);
+            console.log(`📊 Parameters updated:`);
+            console.log(`   • Emptying Process: ${params.procesoVaciado} days`);
+            console.log(`   • SA Waiting Pool: ${params.poolEsperaSA} days`);
+            console.log(`   • Filling Process: ${params.procesoLlenado} days`);
+            console.log(`   • SIN Waiting Pool: ${params.poolEsperaSIN} days`);
             
             // Si cambió el buffer de seguridad, actualizar los tanques inmediatamente
             if (oldBufferSecurity !== params.bufferSecurity) {
@@ -1595,13 +1595,13 @@
             
             // Etiquetas de las etapas
             const stages = [
-                'Pool SIN\n(Vacíos)',
-                'En Proceso\nLlenado SIN',
-                'Llenado\nCompletado',
-                'Buffer\nSeguridad',
-                'Tránsito\nSIN→SA',
-                'En SA\n(Vaciado)',
-                'Tránsito\nSA→SIN'
+                'SIN Pool\n(Empty)',
+                'In Process\nSIN Filling',
+                'Filling\nCompleted',
+                'Security\nBuffer',
+                'Transit\nSIN→SA',
+                'At SA\n(Emptying)',
+                'Transit\nSA→SIN'
             ];
             
             // Obtener datos actuales
@@ -1700,7 +1700,7 @@
             ctx.fillStyle = '#333';
             ctx.font = 'bold 16px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText(`Distribución Actual de Tanques por Etapa - Día ${dayCounter}`, width / 2, 35);
+            ctx.fillText(`Current Tank Distribution by Stage - Day ${dayCounter}`, width / 2, 35);
         }
 
         function updateChart() {
@@ -1712,12 +1712,12 @@
             const btn = document.getElementById('chartAutoBtn');
             
             if (chartAutoUpdate) {
-                btn.textContent = '▶️ Auto-actualización';
+                btn.textContent = '▶️ Auto-update';
                 btn.classList.add('active');
                 chartUpdateInterval = setInterval(updateChart, 2000); // Actualizar cada 2 segundos
                 console.log('📊 Auto-actualización del gráfico activada');
             } else {
-                btn.textContent = '⏸️ Auto-actualización';
+                btn.textContent = '⏸️ Auto-update';
                 btn.classList.remove('active');
                 if (chartUpdateInterval) {
                     clearInterval(chartUpdateInterval);
@@ -1806,7 +1806,7 @@
             if (isRunning) return;
             
             isRunning = true;
-            document.getElementById('playBtn').textContent = '⏸️ Pausar';
+            document.getElementById('playBtn').textContent = '⏸️ Pause';
             document.getElementById('playBtn').classList.add('pause');
             
             runSimulation();
@@ -1816,7 +1816,7 @@
             if (!isRunning) return;
             
             isRunning = false;
-            document.getElementById('playBtn').textContent = '▶️ Iniciar';
+            document.getElementById('playBtn').textContent = '▶️ Start';
             document.getElementById('playBtn').classList.remove('pause');
             
             if (simulationInterval) {
